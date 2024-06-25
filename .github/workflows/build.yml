@@ -11,9 +11,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        phase:
+          - first
+          - second
+          - third
         os:
-          - ubuntu-latest
-          - windows-latest
+#          - ubuntu-latest
+#          - windows-latest
           - macos-latest
 
     runs-on: ${{ matrix.os }}
@@ -21,3 +25,28 @@ jobs:
     steps:
       - name: Checkout tree
         uses: actions/checkout@v4
+
+      - name: which patch
+        run: |
+          for i in $(which -a patch); do echo "$i - $($i --version 2>&1 | head -n 1)"; done
+          for i in $(which -a gpatch); do echo "$i - $($i --version 2>&1 | head -n 1)"; done
+
+      - name: install gpatch
+        if: matrix.phase == 'first'
+        run: |
+          brew install gpatch
+
+      - name: install opam
+        if: matrix.phase == 'second'
+        run: |
+          brew install opam
+
+      - name: install opam and patch
+        if: matrix.phase == 'third'
+        run: |
+          brew install gpatch opam
+
+      - name: which patch
+        run: |
+          for i in $(which -a patch); do echo "$i - $($i --version 2>&1 | head -n 1)"; done
+          for i in $(which -a gpatch); do echo "$i - $($i --version 2>&1 | head -n 1)"; done
